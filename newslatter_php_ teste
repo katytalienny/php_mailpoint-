@@ -1,0 +1,259 @@
+<?php
+/** 
+* Hulk-buster: automatiza a criacao da newsletter PoliInforma - paulo_villegas - 2022-07-05
+*
+* Destaques - 187
+* Dia-a-dia na Poli - 298 
+* Poli na Midia - 240
+* Estagios - 1219
+* Oportunidades - 245 (dentro de comunicados internos), 1220/269
+* Comunicados Internos - 245
+* Estagios - 1219
+*/
+
+$mysqli = new mysqli('python', 'wpoli', 'wSbmgsZTBJSR8bfakQShhxr8', 'wpoli');
+$mysqli->set_charset("utf8");
+setlocale(LC_TIME, 'pt_BR');
+
+$mysqli_news = new mysqli('data1', 'root', 'q3s5c7', 'newsletter_wp');
+$mysqli_news->set_charset("utf8");
+
+//$stmt = $mysqli_news->prepare("INSERT INTO wp_mailpoet_newsletters (id, hash, parent_id, subject, type, sender_address, sender_name, status, reply_to_address, reply_to_name, preheader, body, sent_at, created_at, updated_at, deleted_at, unsubscribe_token, ga_campaign) VALUES (null, substring(md5(?), 1, 12), null, ?, 'standard', 'comunicacao@listas.poli.usp.br', 'Comunicação Poli-USP', 'draft', 'comunicacao@poli.usp.br', 'Comunicação Poli-USP', 'O Poli-Eventos é uma publicação semanal, produzida e editada pela Comunicação Institucional da Poli-USP.', ?, null, now(), now(), null, substring(sha1(?), 1, 15), ?)");
+
+//Static header
+$news_header = '{"content":{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"#eeeeee"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"spacer","styles":{"block":{"backgroundColor":"transparent","height":"20px"}}},{"type":"header","text":"<p><a href=\"[link:newsletter_view_in_browser_url]\">Acesse no seu navegador.</a></p>","styles":{"block":{"backgroundColor":"transparent"},"text":{"fontColor":"#222222","fontFamily":"Arial","fontSize":"12px","textAlign":"center"},"link":{"fontColor":"#6cb7d4","textDecoration":"underline"}}}]}]},{"type":"container","columnLayout":"1_2","orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"#e0e0e0"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"","src":"http://newsletter.poli.usp.br/wp-content/uploads/2022/11/Logo_Escola-Politecnica-Minerva-sem-fundo-2.png","alt":"Logo_Escola-Politécnica-+-Minerva-sem-fundo","fullWidth":false,"width":"134.5px","height":"781px","styles":{"block":{"textAlign":"left"}}}]},{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"social","iconSet":"circles","styles":{"block":{"textAlign":"right"}},"icons":[{"type":"socialIcon","iconType":"facebook","link":"https://www.facebook.com/politecnicausp","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Facebook.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Facebook"},{"type":"socialIcon","iconType":"twitter","link":"https://twitter.com/epusp","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Twitter.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Twitter"},{"type":"socialIcon","iconType":"instagram","link":"https://www.instagram.com/poliusp/","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Instagram.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Instagram"},{"type":"socialIcon","iconType":"youtube","link":"https://www.youtube.com/channel/UCJU4uI6j2lfSKkzktwFWQRw","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Youtube.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Youtube"},{"type":"socialIcon","iconType":"linkedin","link":"https://pt.linkedin.com/school/escola-polit%C3%A9cnica-da-usp/","image":"https://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/LinkedIn.png?mailpoet_version=3.91.0","height":"32px","width":"32px","text":"LinkedIn"},{"type":"socialIcon","iconType":"custom","link":"http://www.flickr.com/photos/poliusp/","image":"http://www.poli.usp.br/wp-content/uploads/2022/06/icone-foto.png","height":"32px","width":"32px","text":"Banco de Imagens - Flickr"}]}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"","src":"http://newsletter.poli.usp.br/wp-content/uploads/2022/06/cabecalho-poli-informa-semanal.png","alt":"cabeçalho poli informa semanal","fullWidth":false,"width":"642.5px","height":"212px","styles":{"block":{"textAlign":"center"}}}]}]},';
+
+//Dados da edicao da Newsletter
+//$news_header .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"spacer","styles":{"block":{"backgroundColor":"transparent","height":"20px"}}},{"type":"text","text":"<p style=\"text-align: center\"><strong>Edi&ccedil;&atilde;o de ' . date('j') . '&ordm; de ' . strftime('%B') . ' de ' . date('Y') . '</strong></p>\n<p style=\"text-align: center\"><strong>n&ordm; [autoincrement de newsletter?]/' . date('Y') . '</strong></p>"}]}]},';
+
+$news_header .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"13.5px","borderStyle":"solid","borderWidth":"2px","borderColor":"#ffcc00"}}},{"type":"text","text":"<p style=\"text-align: center\"><strong>Edi&ccedil;&atilde;o de ' . date('j') . '&ordm; de ' . strftime('%B') . ' de ' . date('Y') . '</strong></p>\n<p style=\"text-align: center\"><strong>n&ordm; [autoincrement de newsletter?]/' . date('Y') . '</strong></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"13.5px","borderStyle":"solid","borderWidth":"2px","borderColor":"#ffcc00"}}}]}]},';
+
+
+
+//Destaques
+$recordset = $mysqli->query("SELECT concat('https://www.poli.usp.br/noticias/destaque-home/', P.id, '-', P.post_name, '.html') as link, 
+(SELECT replace(X.guid, 'http:', 'https:') FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+P.post_title, P.post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND T.term_id = 187
+ORDER BY P.post_date DESC");
+$destaques = $recordset->fetch_all(MYSQLI_ASSOC);
+
+$news_destaques = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1><strong><span style=\"color: #e67e23\">Destaques</span></strong></h1>"}]}]},';
+
+foreach($destaques as $destaque){
+	$news_destaques .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 style=\"text-align: left\"><a href=\"' . trim($destaque['link']) . '\">' . trim($destaque['post_title']) . '</a></h1>"},{"type":"image","link":"' . trim($destaque['link']) . '","src":"' . trim($destaque['thumbnail']) . '","alt":"' . trim($destaque['post_title']) . '","fullWidth":false,"width":"671.5px","height":"416px","styles":{"block":{"textAlign":"center"}}},{"type":"text","text":"<p><span style=\"background-color: inherit\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($destaque['post_content']))))))) . '</span><span style=\"background-color: inherit\"></span><a href=\"' . trim($destaque['link']) . '\" style=\"background-color: inherit\">Leia mais.</a><br /><span></span></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"18.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+}
+
+$news_diaadia = '';
+
+//Dia-a-dia na Poli
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/dia-a-dia-na-poli/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND T.term_id = 298
+ORDER BY P.post_date DESC");
+$diaadia = $recordset->fetch_all(MYSQLI_ASSOC);
+
+if(!empty($diaadia)){
+	$news_diaadia = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1><strong><span style=\"color: #e67e23\">Dia-a-dia na Poli</span></strong><span style=\"color: #012169\"><strong></strong></span></h1>"}]}]},';
+	foreach($diaadia as $dia){
+        	$news_diaadia .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 class=\"elementor-heading-title elementor-size-default\"><a href=\"' . $dia['link'] . '\">' . $dia['post_title'] . '</a></h1>"}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<p>' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($dia['post_content']))))))) . ' <a href=\"' . $dia['link'] . '\">Leia mais.</a></p>"}]},{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"' . $dia['link'] . '","src":"' . $dia['thumbnail'] . '","alt":"' . $dia['post_title'] . '","fullWidth":false,"width":"1200px","height":"868px","styles":{"block":{"textAlign":"center"}}}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"13.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+	}
+}
+
+$news_jornalusp = '';
+
+//Poli no Jornal da USP
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/polinamidia/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND T.term_id = 240
+AND P.post_content LIKE '%Jornal da USP%'
+ORDER BY P.post_date DESC");
+$jornalusp = $recordset->fetch_all(MYSQLI_ASSOC);
+
+if(!empty($jornalusp)){
+        $news_jornalusp = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1><strong><span style=\"color: #e67e23\">A Poli no Jornal da USP</span></strong><span style=\"color: #012169\"><strong></strong></span></h1>"}]}]},';
+        foreach($jornalusp as $dia){
+                $news_jornalusp .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 class=\"elementor-heading-title elementor-size-default\"><a href=\"' . $dia['link'] . '\">' . $dia['post_title'] . '</a></h1>"},{"type":"image","link":"' . $dia['link'] . '","src":"' . $dia['thumbnail'] . '","alt":"' . $dia['post_title'] . '","fullWidth":false,"width":"1392px","height":"928px","styles":{"block":{"textAlign":"center"}}},{"type":"text","text":"<p style=\"text-align: justify\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($dia['post_content']))))))) . ' <a href=\"' . $dia['link'] . '\">Leia mais.</a></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"18.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+        }
+}
+
+$news_polinamidia = '';
+
+//Poli na Midia
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/polinamidia/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND T.term_id = 240
+AND P.post_content NOT LIKE '%Jornal da USP%'
+ORDER BY P.post_date DESC");
+$polinamidia = $recordset->fetch_all(MYSQLI_ASSOC);
+
+if(!empty($polinamidia)){
+        $news_polinamidia = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1><strong><span style=\"color: #e67e23\">Poli na mídia</span></strong><span style=\"color: #012169\"><strong></strong></span></h1>"}]}]},';
+        foreach($polinamidia as $dia){
+                $news_polinamidia .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 class=\"elementor-heading-title elementor-size-default\"><a href=\"' . $dia['link'] . '\">' . $dia['post_title'] . '</a></h1>"},{"type":"image","link":"' . $dia['link'] . '","src":"' . $dia['thumbnail'] . '","alt":"' . $dia['post_title'] . '","fullWidth":false,"width":"1392px","height":"928px","styles":{"block":{"textAlign":"center"}}},{"type":"text","text":"<p style=\"text-align: justify\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($dia['post_content']))))))) . ' <a href=\"' . $dia['link'] . '\">Leia mais.</a></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"18.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+        }
+}
+
+$news_oportunidades = '';
+
+//Estagios
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND P.post_title LIKE '%vaga%de est_gio%'
+AND T.term_id = 1219
+ORDER BY P.post_date DESC LIMIT 1");
+$estagios = $recordset->fetch_all(MYSQLI_ASSOC);
+
+$news_estagios = '';
+if(!empty($estagios)){
+	foreach($estagios as $e){
+		$news_estagios .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 style=\"text-align: center\"><a href=\"' . $e['link'] . '\">Confira as vagas de estágio da semana.</a></h1>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"9px","borderStyle":"solid","borderWidth":"2px","borderColor":"#ffcc00"}},"context":"posts.divider"}]}]},';
+	}
+}
+
+//Oportunidades
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/comunicados-internos/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND T.term_id IN (1220, 269)
+ORDER BY P.post_date DESC");
+$oportunidades = $recordset->fetch_all(MYSQLI_ASSOC);
+
+//Oportunidades Comunicados Internos
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/comunicados-internos/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND ( P.post_title LIKE '%convid%'
+OR P.post_title LIKE '%workshop%'
+OR P.post_title LIKE '%oferece%'
+OR P.post_title LIKE '%inscri%'
+OR P.post_title LIKE '%aberta%'
+OR P.post_title LIKE '%abre%' 
+OR P.post_title LIKE '%chamada%' )
+AND T.term_id = 245
+ORDER BY P.post_date");
+$oportunidaes_ci = $recordset->fetch_all(MYSQLI_ASSOC);
+
+//if(!empty($estagios) || !empty($oportunidades) || !empty($oportunidaes_ci)){
+if(!empty($oportunidades) || !empty($oportunidaes_ci)){
+	$news_oportunidades = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1><strong><span style=\"color: #e67e23\">Oportunidades</span></strong></h1>"}]}]},';
+//	foreach($estagios as $e){
+//		if(empty($e['thumbnail'])){
+//			$news_oportunidades .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h3 style=\"text-align: left\"><a href=\"' . $e['link'] . '\">' . $e['post_title'] . '</a></h3>\n<p class=\"mailpoet_wp_post\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($e['post_content']))))))) . ' <a href=\"' . $e['link'] . '\">Leia mais.</a></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"9px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}},"context":"posts.divider"}]}]},';
+//		}else{
+//			$news_oportunidades .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 class=\"entry-title\"><a href=\"' . $e['link'] . '\">' . $e['post_title'] . '</a></h1>"}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<p>' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($e['post_content']))))))) . '<span> </span><span></span><a href=\"' . $e['link'] . '\"><span>Leia mais.</span></a></p>"}]},{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"' . $e['link'] . '","src":"' . $e['thumbnail'] . '","alt":"' . $e['post_title'] . '","fullWidth":false,"width":"1200px","height":"630px","styles":{"block":{"textAlign":"center"}}}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"18.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+//		}
+//	}
+	foreach($oportunidades as $e){
+		if(empty($e['thumbnail'])){
+                        $news_oportunidades .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h3 style=\"text-align: left\"><a href=\"' . $e['link'] . '\">' . $e['post_title'] . '</a></h3>\n<p class=\"mailpoet_wp_post\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($e['post_content']))))))) . ' <a href=\"' . $e['link'] . '\">Leia mais.</a></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"9px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}},"context":"posts.divider"}]}]},';
+                }else{
+                        $news_oportunidades .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 class=\"entry-title\"><a href=\"' . $e['link'] . '\">' . $e['post_title'] . '</a></h1>"}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<p>' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($e['post_content']))))))) . '<span> </span><span></span><a href=\"' . $e['link'] . '\"><span>Leia mais.</span></a></p>"}]},{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"' . $e['link'] . '","src":"' . $e['thumbnail'] . '","alt":"' . $e['post_title'] . '","fullWidth":false,"width":"1200px","height":"630px","styles":{"block":{"textAlign":"center"}}}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"18.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+                }
+	}
+	foreach($oportunidaes_ci as $e){
+		if(empty($e['thumbnail'])){
+                        $news_oportunidades .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h3 style=\"text-align: left\"><a href=\"' . $e['link'] . '\">' . $e['post_title'] . '</a></h3>\n<p class=\"mailpoet_wp_post\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($e['post_content']))))))) . ' <a href=\"' . $e['link'] . '\">Leia mais.</a></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"9px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}},"context":"posts.divider"}]}]},';
+                }else{
+                        $news_oportunidades .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1 class=\"entry-title\"><a href=\"' . $e['link'] . '\">' . $e['post_title'] . '</a></h1>"}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<p>' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($e['post_content']))))))) . '<span> </span><span></span><a href=\"' . $e['link'] . '\"><span>Leia mais.</span></a></p>"}]},{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"' . $e['link'] . '","src":"' . $e['thumbnail'] . '","alt":"' . $e['post_title'] . '","fullWidth":false,"width":"1200px","height":"630px","styles":{"block":{"textAlign":"center"}}}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"18.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}}}]}]},';
+                }
+	}
+}
+
+$news_comunicados = '';
+
+//Comunicados Internos
+$recordset = $mysqli->query("SELECT trim(concat('https://www.poli.usp.br/noticias/comunicados-internos/', P.id, '-', P.post_name, '.html')) as link,
+(SELECT trim(replace(X.guid, 'http:', 'https:')) FROM wp_postmeta M, wp_posts X WHERE X.id = M.meta_value AND M.meta_key = '_thumbnail_id' AND M.post_id = P.id LIMIT 1) as thumbnail,
+trim(P.post_title) as post_title, trim(P.post_content) as post_content
+FROM wp_posts P
+LEFT JOIN wp_term_relationships R ON (P.ID = R.object_id)
+LEFT JOIN wp_term_taxonomy T ON (R.term_taxonomy_id = T.term_taxonomy_id)
+WHERE P.post_type = 'post'
+AND P.post_status = 'publish'
+AND P.post_date between date_format(DATE_SUB(NOW(), INTERVAL 7 DAY), '%Y-%m-%d 00:00:00') AND date_format(now(), '%Y-%m-%d 00:00:00')
+AND T.taxonomy = 'category'
+AND T.term_id = 245
+ORDER BY P.post_date DESC");
+$comunicados = $recordset->fetch_all(MYSQLI_ASSOC);
+
+if(!empty($comunicados)){
+	$news_comunicados = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h1><strong><span style=\"color: #e67e23\">Avisos!</span></strong></h1>"}]}]},';
+	foreach($comunicados as $c){
+		$news_comunicados .= '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":"<h3 style=\"text-align: left\"><a href=\"' . $c['link'] . '\">' . $c['post_title'] . '</a></h3>\n<p class=\"mailpoet_wp_post\">' . trim(preg_replace('/\s\s+/', ' ', str_replace(array("\r", "\n"), '', nl2br(addslashes(str_replace("'", '&apos;', strip_tags($c['post_content']))))))) . ' <a href=\"' . $c['link'] . '\">Leia mais.</a></p>"},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"9px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}},"context":"posts.divider"}]}]},';
+	}
+}
+
+$news_imagens = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"","src":"http://newsletter.poli.usp.br/wp-content/uploads/2022/07/POLI-USO-DE-MASCARA-TV.png","alt":"POLI USO DE MASCARA TV","fullWidth":false,"width":"1920px","height":"1080px","styles":{"block":{"textAlign":"center"}}},{"type":"divider","styles":{"block":{"backgroundColor":"transparent","padding":"13px","borderStyle":"solid","borderWidth":"2px","borderColor":"#ffcc00"}},"context":"posts.divider"}]}]},';
+
+
+
+
+
+$news_footer = '{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"image","link":"","src":"http://newsletter.poli.usp.br/wp-content/uploads/2022/11/Logo_Escola-Politecnica-Minerva-sem-fundo-2.png","alt":"Logo_Escola-Politécnica-+-Minerva-sem-fundo","fullWidth":false,"width":"152.65625px","height":"781px","styles":{"block":{"textAlign":"center"}}},{"type":"text","text":"<p class=\"align-center\" style=\"text-align: center\"><strong>Escola Polit&eacute;cnica</strong><br /><strong>Universidade de S&atilde;o Paulo</strong></p>\n<p class=\"align-center\" style=\"text-align: center\"><br /><strong>Expediente</strong></p>\n<p class=\"align-center\" style=\"text-align: center\">Reitor:&nbsp;<span>Carlos Gilberto Carlotti Junior</span><br />Vice-reitor:&nbsp;<span>Maria Arminda do Nascimento Arruda</span></p>\n<p class=\"align-center\" style=\"text-align: center\"><strong>Escola Polit&eacute;cnica da USP</strong><br />Diretor:&nbsp;<span>Reinaldo Giudici</span><br />Vice-diretor:&nbsp;S&iacute;lvio Ikuyo Nabeta</p>\n<p class=\"align-center\"></p>\n<p><strong>Equipe de Jornalismo e Imprensa</strong></p>\n<p>Coordena&ccedil;&atilde;o geral: Ena&eacute;ge Dalan Sant\'Ana</p>\n<p>Amanda Rabelo &ndash; jornalista</p>\n<p><span class=\"gD\">Guilherme Bento e Jaqueline Silva -</span>&nbsp;estagi&aacute;rios de jornalismo.</p>\n<p>Projeto gr&aacute;fico: Rosana Simone</p>\n<p>O PoliInforma &eacute; uma publica&ccedil;&atilde;o semanal, produzida e editada pela equipe de jornalismo Poli-USP. Se destina a divulgar not&iacute;cias da Poli e demais unidades da USP para seus docentes, alunos e funcion&aacute;rios.</p>\n<p>Pedidos de divulga&ccedil;&atilde;o devem ser solicitados pelo&nbsp;e-mail&nbsp;<strong>comunicacao.poli@usp.br</strong>, de segunda a quarta-feira, impreterivelmente.</p><span style=\"color: #ffffff\">[HB]</span>"},{"type":"footer","text":"<p>Para cancelar sua assinatura, responda a este e-mail para comunicacao.poli@usp.br com o seu pedido.</p>","styles":{"block":{"backgroundColor":"transparent"},"text":{"fontColor":"#222222","fontFamily":"Arial","fontSize":"12px","textAlign":"center"},"link":{"fontColor":"#6cb7d4","textDecoration":"none"}}}]}]},{"type":"container","columnLayout":false,"orientation":"horizontal","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"container","columnLayout":false,"orientation":"vertical","image":{"src":null,"display":"scale"},"styles":{"block":{"backgroundColor":"transparent"}},"blocks":[{"type":"text","text":""}]}]}]},"globalStyles":{"text":{"fontColor":"#000000","fontFamily":"Lora","fontSize":"14px","lineHeight":"1.6"},"h1":{"fontColor":"#111111","fontFamily":"Playfair Display","fontSize":"24px","lineHeight":"1.6"},"h2":{"fontColor":"#222222","fontFamily":"Playfair Display","fontSize":"36px","lineHeight":"1.6"},"h3":{"fontColor":"#333333","fontFamily":"Noticia Text","fontSize":"20px","lineHeight":"1.6"},"link":{"fontColor":"#012169","textDecoration":"none"},"wrapper":{"backgroundColor":"#ffffff"},"body":{"backgroundColor":"#eeeeee"}},"blockDefaults":{"abandonedCartContent":{"amount":"2","withLayout":true,"contentType":"product","postStatus":"publish","inclusionType":"include","displayType":"excerpt","titleFormat":"h1","titleAlignment":"left","titleIsLink":false,"imageFullWidth":false,"featuredImagePosition":"alternate","pricePosition":"below","readMoreType":"none","readMoreText":"","readMoreButton":[],"sortBy":"newest","showDivider":true,"divider":{"context":"abandonedCartContent.divider","styles":{"block":{"backgroundColor":"transparent","padding":"13px","borderStyle":"solid","borderWidth":"3px","borderColor":"#aaaaaa"}}},"backgroundColor":"#ffffff","backgroundColorAlternate":"#eeeeee"},"automatedLatestContent":{"amount":"5","withLayout":false,"contentType":"post","inclusionType":"include","displayType":"excerpt","titleFormat":"h1","titleAlignment":"left","titleIsLink":false,"imageFullWidth":false,"featuredImagePosition":"belowTitle","showAuthor":"no","authorPrecededBy":"Author:","showCategories":"no","categoriesPrecededBy":"Categories:","readMoreType":"button","readMoreText":"Read more","readMoreButton":{"text":"Read more","url":"[postLink]","context":"automatedLatestContent.readMoreButton","styles":{"block":{"backgroundColor":"#2ea1cd","borderColor":"#0074a2","borderWidth":"1px","borderRadius":"5px","borderStyle":"solid","width":"180px","lineHeight":"40px","fontColor":"#ffffff","fontFamily":"Verdana","fontSize":"18px","fontWeight":"normal","textAlign":"center"}}},"sortBy":"newest","showDivider":true,"divider":{"context":"automatedLatestContent.divider","styles":{"block":{"backgroundColor":"transparent","padding":"13px","borderStyle":"solid","borderWidth":"3px","borderColor":"#aaaaaa"}}},"backgroundColor":"#ffffff","backgroundColorAlternate":"#eeeeee"},"automatedLatestContentLayout":{"amount":"5","withLayout":true,"contentType":"post","inclusionType":"include","displayType":"excerpt","titleFormat":"h2","titleAlignment":"left","titleIsLink":false,"imageFullWidth":false,"featuredImagePosition":"alternate","showAuthor":"no","authorPrecededBy":"Author:","showCategories":"aboveText","categoriesPrecededBy":"Categories:","readMoreType":"link","readMoreText":"Leia mais.","readMoreButton":{"text":"Read more","url":"[postLink]","context":"automatedLatestContentLayout.readMoreButton","styles":{"block":{"backgroundColor":"#2ea1cd","borderColor":"#0074a2","borderWidth":"1px","borderRadius":"5px","borderStyle":"solid","width":"180px","lineHeight":"40px","fontColor":"#ffffff","fontFamily":"Verdana","fontSize":"18px","fontWeight":"normal","textAlign":"center"}},"type":"button"},"sortBy":"newest","showDivider":true,"divider":{"context":"automatedLatestContentLayout.divider","styles":{"block":{"backgroundColor":"transparent","padding":"13px","borderStyle":"solid","borderWidth":"3px","borderColor":"#aaaaaa"}},"type":"divider"},"backgroundColor":"#ffffff","backgroundColorAlternate":"#eeeeee","type":"automatedLatestContentLayout","terms":[],"titlePosition":"abovePost","fullPostFeaturedImagePosition":"left"},"button":{"text":"Read more","url":"[postLink]","styles":{"block":{"backgroundColor":"#2ea1cd","borderColor":"#0074a2","borderWidth":"1px","borderRadius":"5px","borderStyle":"solid","width":"180px","lineHeight":"40px","fontColor":"#ffffff","fontFamily":"Verdana","fontSize":"18px","fontWeight":"normal","textAlign":"center"}},"type":"button"},"container":[],"divider":{"styles":{"block":{"backgroundColor":"transparent","padding":"13.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}},"type":"divider"},"footer":{"text":"<p><a href=\"[link:subscription_unsubscribe_url]\">Cancelar assinatura</a> | <a href=\"[link:subscription_manage_url]\">Gerencie suas assinatura</a><br />Adicione seu endereço posta aqui!</p>","styles":{"block":{"backgroundColor":"transparent"},"text":{"fontColor":"#222222","fontFamily":"Arial","fontSize":"12px","textAlign":"center"},"link":{"fontColor":"#6cb7d4","textDecoration":"none"}},"type":"footer"},"posts":{"amount":"10","withLayout":true,"contentType":"post","postStatus":"draft","inclusionType":"include","displayType":"full","titleFormat":"h1","titleAlignment":"left","titleIsLink":false,"imageFullWidth":false,"featuredImagePosition":"alternate","showAuthor":"no","authorPrecededBy":"Author:","showCategories":"no","categoriesPrecededBy":"Categories:","readMoreType":"link","readMoreText":"Leia mais.","readMoreButton":{"text":"Read more","url":"[postLink]","context":"posts.readMoreButton","styles":{"block":{"backgroundColor":"#2ea1cd","borderColor":"#0074a2","borderWidth":"1px","borderRadius":"5px","borderStyle":"solid","width":"180px","lineHeight":"40px","fontColor":"#ffffff","fontFamily":"Verdana","fontSize":"18px","fontWeight":"normal","textAlign":"center"}},"type":"button"},"sortBy":"newest","showDivider":true,"divider":{"context":"posts.divider","styles":{"block":{"backgroundColor":"transparent","padding":"9.5px","borderStyle":"dotted","borderWidth":"2px","borderColor":"#aaaaaa"}},"type":"divider"},"backgroundColor":"#ffffff","backgroundColorAlternate":"#eeeeee","type":"posts","offset":10,"terms":[{"text":"Categoria: Comunicados Internos","id":33,"term_id":33,"name":"Comunicados Internos","slug":"comunicados-internos","term_group":0,"term_taxonomy_id":33,"taxonomy":"category","description":"","parent":27,"count":0,"filter":"raw","selected":true}],"search":"","titlePosition":"abovePost","fullPostFeaturedImagePosition":"left"},"products":{"amount":"10","withLayout":true,"contentType":"product","postStatus":"publish","inclusionType":"include","displayType":"excerpt","titleFormat":"h1","titleAlignment":"left","titleIsLink":false,"imageFullWidth":false,"featuredImagePosition":"alternate","pricePosition":"below","readMoreType":"link","readMoreText":"Compre agora","readMoreButton":{"text":"Compre agora","url":"[postLink]","context":"posts.readMoreButton","styles":{"block":{"backgroundColor":"#2ea1cd","borderColor":"#0074a2","borderWidth":"1px","borderRadius":"5px","borderStyle":"solid","width":"180px","lineHeight":"40px","fontColor":"#ffffff","fontFamily":"Verdana","fontSize":"18px","fontWeight":"normal","textAlign":"center"}}},"sortBy":"newest","showDivider":true,"divider":{"context":"posts.divider","styles":{"block":{"backgroundColor":"transparent","padding":"13px","borderStyle":"solid","borderWidth":"3px","borderColor":"#aaaaaa"}}},"backgroundColor":"#ffffff","backgroundColorAlternate":"#eeeeee"},"social":{"iconSet":"circles","icons":[{"type":"socialIcon","iconType":"facebook","link":"https://www.facebook.com/politecnicausp","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Facebook.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Facebook"},{"type":"socialIcon","iconType":"twitter","link":"https://twitter.com/epusp","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Twitter.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Twitter"},{"type":"socialIcon","iconType":"instagram","link":"https://www.instagram.com/poliusp/","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Instagram.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Instagram"},{"type":"socialIcon","iconType":"youtube","link":"https://www.youtube.com/channel/UCJU4uI6j2lfSKkzktwFWQRw","image":"http://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/Youtube.png?mailpoet_version=3.15.0","height":"32px","width":"32px","text":"Youtube"},{"type":"socialIcon","iconType":"linkedin","link":"https://pt.linkedin.com/school/escola-polit%C3%A9cnica-da-usp/","image":"https://newsletter.poli.usp.br/wp-content/plugins/mailpoet/assets/img/newsletter_editor/social-icons/03-circles/LinkedIn.png?mailpoet_version=3.91.0","height":"32px","width":"32px","text":"LinkedIn"},{"type":"socialIcon","iconType":"custom","link":"http://www.flickr.com/photos/poliusp/","image":"http://www.poli.usp.br/wp-content/uploads/2022/06/icone-foto.png","height":"32px","width":"32px","text":"Banco de Imagens - Flickr"}],"type":"social","styles":{"block":{"textAlign":"right"}}},"spacer":{"styles":{"block":{"backgroundColor":"transparent","height":"20px"}},"type":"spacer"},"header":{"text":"<a href=\"[link:newsletter_view_in_browser_url]\">Veja isso no seu navegador.</a>","styles":{"block":{"backgroundColor":"transparent"},"text":{"fontColor":"#222222","fontFamily":"Arial","fontSize":"12px","textAlign":"center"},"link":{"fontColor":"#6cb7d4","textDecoration":"underline"}},"type":"header"}}}';
+
+
+//echo $news_header . $news_destaques . $news_jornalusp . $news_polinamidia . $news_diaadia . $news_oportunidades . $news_comunicados . $news_estagios . $news_imagens . $news_footer;
+$titulo = '[HB] Polinforma - ' . date('j') . ' de ' . strftime('%B')  . ' de ' . date('Y');
+$corpo_news = $news_header . $news_destaques . $news_jornalusp . $news_polinamidia . $news_diaadia . $news_oportunidades . $news_comunicados . $news_estagios . $news_imagens . $news_footer;
+$ga_campaign = 'poli-eventos-' . date('j') . '-de-' . strftime('%B') . '-de-' . date('Y') . '_42';
+
+//var_dump($mysqli_news);
+$stmt = $mysqli_news->prepare("INSERT INTO wp_mailpoet_newsletters (id, hash, parent_id, subject, type, sender_address, sender_name, status, reply_to_address, reply_to_name, preheader, body, sent_at, created_at, updated_at, deleted_at, unsubscribe_token, ga_campaign) VALUES (null, substring(md5(?), 1, 12), null, ?, 'standard', 'comunicacao@listas.poli.usp.br', 'Comunicação Poli-USP', 'draft', 'comunicacao@poli.usp.br', 'Comunicação Poli-USP', 'O Poli-Eventos é uma publicação semanal, produzida e editada pela Comunicação Institucional da Poli-USP.', ?, null, now(), now(), null, substring(sha1(?), 1, 15), ?)");
+
+$stmt->bind_param("sssss", $titulo, $titulo, $corpo_news, $titulo, $ga_campaign);
+
+$stmt->execute();
